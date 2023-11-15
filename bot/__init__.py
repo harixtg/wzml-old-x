@@ -855,9 +855,10 @@ if ospath.exists('categories.txt'):
             else:
                 CATEGORY_INDEX.append('')
 
-if BASE_URL:
-    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
 
+PORT = environ.get('PORT')
+Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
+alive = Popen(["python3", "alive.py"])
 srun(["qbittorrent-nox", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     srun(["touch", ".netrc"])
@@ -865,19 +866,18 @@ srun(["cp", ".netrc", "/root/.netrc"])
 srun(["chmod", "600", ".netrc"])
 srun(["chmod", "+x", "aria.sh"])
 srun("./aria.sh", shell=True)
-if ospath.exists('accounts.zip'):
-    if ospath.exists('accounts'):
-        srun(["rm", "-rf", "accounts"])
-    srun(["7z", "x", "accounts.zip", "-oaccounts", "-aoa", "*.json"])
-    srun(["chmod", "-R", "777", "accounts"])
-if not ospath.exists('accounts'):
-    config_dict['USE_SERVICE_ACCOUNTS'] = False
-sleep(0.5)
-
 aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
 
 def get_client():
     return qbClient(host="localhost", port=8090, VERIFY_WEBUI_CERTIFICATE=False, REQUESTS_ARGS={'timeout': (30, 60)})
+
+#if BASE_URL:
+#    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
+
+aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
+
+#def get_client():
+#    return qbClient(host="localhost", port=8090, VERIFY_WEBUI_CERTIFICATE=False, REQUESTS_ARGS={'timeout': (30, 60)})
 
 def aria2c_init():
     try:
