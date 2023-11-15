@@ -22,6 +22,7 @@ lxml>=4.9.1
 markdown
 mediainfo
 pillow
+uvloop==0.19.0
 psutil
 pybase64
 pycountry
